@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>New HMTL document by NewJect</title>
+<style>
+    *{padding: 0;margin: 0;}
+    .tab{margin: 50px;width: 500px}
+    .tab:after{content: "";clear: both;}
+    .tab ul li{display: block;float: left;width: 32.5%;}
+    .tab .tabs div{width: 98.25%;}
+    .tab ul li{
+        cursor: pointer;
+        background: #eaeaed;
+        color: #0087cc;
+        display: block;
+        font-weight: 600;
+        padding: 10px 0;
+        text-align: center;
+        text-decoration: none;
+        border: 1px solid #cecfd5;
+    }
+    .tab ul li:first-child{
+        border-right: 0;
+        border-top-left-radius: 6px;
+    }
+    .tab ul li:last-child{
+        border-top-right-radius: 6px;
+    }
+    .tab ul:after{content: "";clear: both;}
+    .tab .tabs{clear: both;position: relative;}
+    .tab .tabs div{clear: both;display: none;
+        border: 1px solid #cecfd5;
+        border-radius: 0 0 6px 6px;
+        border-top: 0;
+        padding: 24px 0px;
+    }  
+    .tab ul li.active{
+        border-bottom-color: transparent;
+        background-color: #fff;
+        color: #2db34a;
+        cursor: default;
+    }
+    .tab .tabs .active{display: block;}
+    </style>
+</head>
+<body>
+<div class="tab" id="tab1">
+    <ul class="tags">
+        <li class="active">tag1</li>
+        <li >tag2</li>
+        <li>tag3</li>
+    </ul>
+    <div class="tabs">
+        <div class="active">tab1</div>
+        <div>tab2</div>
+        <div>tab3</div>
+    </div>
+</div>
+</body>
+<script>
+    window.onload=function(){
+        document.querySelector("#tab1").querySelector(".tags").onclick=function(){abc(event)};
+    }
+    function abc(e){        
+        var tags = e.target.parentNode.getElementsByTagName("li");
+        var tabs = e.target.parentElement.parentElement.querySelector(".tabs").children;
+        var index;
+        for(var i=0;i<tags.length;i++){
+            removeClass(tags[i],"active");
+        }
+        addClass(e.target,"active");
+        for(var i = 0;i < tags.length; i++ ){
+            if(e.target == tags[i]){
+                index=i;break;
+            }
+        }
+        for(var i=0;i<tabs.length;i++){
+            removeClass(tabs[i],"active");
+        }
+        addClass(tabs[index],"active");
+    }    
+//    添加/删除类名
+    function removeClass(node,cls) {
+        var reg = new RegExp('(\\s|^)' + cls + '(\\s|$)');  
+        node.className = node.className.replace(reg, ' ');  
+    }
+    function addClass(node,cls) {  
+        node.className += " " + cls;  
+    }
+    </script>
+</html>
