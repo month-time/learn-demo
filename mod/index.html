@@ -6,210 +6,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="">
 <meta name="author" content="">
-
+<link rel="stylesheet" href="./style.css">
 <title>New HMTL document by NewJect</title>
 <style>
-    .monitor{
-        overflow: hidden;
-        position: relative;
-        width: 95vw;
-        height: 95vh;
-    }
-    .bg_2{
-        width: 100%;height: 100%;
-        background: url(img/d4.jpg);  
-    }
-    .canva{
-        position: absolute;top: 0px;left: 0px;        
-        background-color: bl;
-        z-index:0;
-        filter:blur(4px);
-    }
-    .grid_1{
-        width: 100%;height: 100%;
-        position: absolute;top: 0px;left: 0px;
-        filter:blur(1px);
-        background: url(img/grid_1.png);        
-        background-position:center;
-        background-size:200px;
-        z-index: 1;
-    } 
-    .text_1{
-        position: absolute;
-        top: 40%;left: 35%;
-    }
     
-    .text_1 p:nth-child(1){
-        position: relative;
-        left: -60px;
-        background:-webkit-linear-gradient(left, #09f , #f62);
-        -webkit-text-fill-color: transparent;
-        -webkit-background-clip: text;
-        font-weight:bolder;
-        font-size: 1.8em;
-        font-family: '微软雅黑',cursive,sans-serif;   
-        text-shadow:5px 10px 6px #000;
-    }
-    .text_1 .line{
-        position: relative;left: -60px;top:-8px;
-        width: 340px; height: 2px;
-        background-color: #000;
-        box-shadow: 5px 2px 6px #000;
-    }
-    .text_1 p:nth-child(3){
-        position: relative;
-        left: 50px;top:-25px;
-        background:-webkit-linear-gradient(left,#f62,#09f);
-        -webkit-text-fill-color: transparent;
-        -webkit-background-clip: text;
-        padding: 5px 10px;
-        font-family: 'Comic Sans MS',cursive,sans-serif;
-        text-shadow:5px 10px 6px #000;
-    }
-    .bg_1{
-        position: absolute;top: 0px;left: 0px;
-        width: 100%;height: 100%;
-        background: url(img/bg_1.png) no-repeat;        
-        background-position: center;
-        z-index: 2;
-        background-size:2200px;
-        animation:comic1_1 2s both,flash 0.2s alternate 1s 2;
-    }
-    @keyframes comic1_1{
-        0%{background-size:2200px;transform: scale(3,1);}
-        50%{background-size:4200px;transform: scale(2);}
-        100%{background-size:2500px;transform: scale(2.2,1.4);}
-    } 
-    @keyframes flash{
-        0%{opacity: 1}
-        100%{opacity: 0.7}
-    }
-    .Solid_1{
-        position: absolute;top: 0px;left: 0px;
-        width: 100%;height: 100%;
-        opacity: 0.4;
-        background:-webkit-linear-gradient(right,#f62,#24f);
-    }
     </style>
 </head>
 <body>
 <div class="monitor">
 <div class="bg_2"></div>
-<div class="canva">
-<canvas id="myCanvas" width="" height="">
-  your browser doesn't support canvas!
-</canvas>
-</div>
 <div class="grid_1"></div>
 <div class="text_1">
     <p>この歌が聴こえてる</p>
     <div class="line"></div>
     <p>Voila, world. This is EGOIST</p>
 </div>
-
 <div class="bg_1"></div>
-
 <div class="Solid_1"></div>
-
+<div class="nav">
+    <ul>
+        <li>开始游戏</li>
+        <li>设置</li>
+        <li>退出</li>
+    </ul>
 </div>
-<script>    
-    var canvas=document.getElementById('myCanvas');
-//    创建画布并设置画布宽高
-    var C_width =(document.documentElement.clientWidth)*(0.95);
-    var C_height =(document.documentElement.clientHeight)*(0.95);
-    canvas.width = C_width;
-    canvas.height = C_height;
-    var context = canvas.getContext('2d');
-//    粒子对象
-    var parts=[];
-//    粒子颜色
-    var part_color='#a5d';
-//    未来位置
-    var fut_pos=[];
-//    运动速度
-    var Speeder= 1;
-    window.onload=function(){
-        create_obj();
-        create_fut();
-        cre_part();
-        setInterval('motion()',30);
-    }
-//    生成对象
-    function create_obj(){        
-        for(var i=0;i<30;i++){
-            var part={
-                x:getRadom(C_width,1),
-                y:getRadom(C_height,1),
-                size:getRadom(8,3)
-            };
-            parts.push(part);
-        }
-//        console.log(parts[2]);
-    }
-//    生成未来位置
-    function create_fut(){
-        for(var i=0;i<parts.length;i++){
-            var fut={
-                fut_x:getRadom(C_width,1),
-                fut_y:getRadom(C_height,1)
-            };
-            fut_pos.push(fut);
-        }
-//        console.log(fut_pos[2]);
-    }
-//    绘制粒子
-    function cre_part(){ 
-        context.fillStyle= part_color;
-        context.shadowColor = part_color;
-        context.shadowBlur = 10;
-        context.shadowOffsetX = 2;
-        context.shadowOffsetY = 2;
-        for(var i=0;i<parts.length;i++){
-            context.beginPath();
-            context.arc(parts[i].x, parts[i].y,parts[i].size,0,  Math.PI * 2);
-            context.fill();
-//          context.stroke();
-            context.closePath();
-        }
-    }
-//    运动粒子
-    function motion(){
-        context.clearRect(0,0,C_width,C_height);
-        context.fillStyle=part_color;
-        context.shadowColor = part_color;
-        for(var i=0;i<parts.length;i++){
-//            计算运动偏移量
-//            var px=parseInt(((parts[i].x-fut_pos[i].fut_x)/Speeder));
-//            var py=parseInt(((parts[i].y-fut_pos[i].fut_y)/Speeder));
-            if((parts[i].x-fut_pos[i].fut_x)<0){                
-               parts[i].x =parts[i].x+Speeder;               
-            }else {
-               parts[i].x =parts[i].x-Speeder;              
-            }            
-            if((parts[i].y-fut_pos[i].fut_y)<0){
-                parts[i].y =parts[i].y+Speeder;
-            }else {
-                parts[i].y =parts[i].y-Speeder;
-            }
-//             console.log('预计位置x:'+fut_pos[i].fut_x+';y:'+fut_pos[i].fut_y);
-//             console.log('现在位置x:'+parts[i].x+';y:'+parts[i].y);
-//            判断是否抵达预定位置
-            if(parts[i].x==fut_pos[i].fut_x||parts[i].y==fut_pos[i].fut_y){
-//                alert(12);
-                fut_pos[i].fut_x=getRadom(C_height,1);
-                fut_pos[i].fut_y=getRadom(C_height,1);
-            }            
-            context.beginPath();
-            context.arc(parts[i].x, parts[i].y,parts[i].size,0,  Math.PI * 2);
-            context.fill();
-//          context.stroke();
-            context.closePath();
-        }
-    }
-    function getRadom(max,min){
-        return parseInt((Math.random()*(max-min)+min));
-    }
-    </script>
-    
+</div>
+<div >
+    <div class="canva">
+    <canvas id="myCanvas" width="" height="">
+      your browser doesn't support canvas!
+    </canvas>
+    </div>
+</div>
+<script src="./js/config.js"></script>
+<script src="./js/app.js"></script>
+<script src="./js/start.js"></script>
 </body>
 </html>
