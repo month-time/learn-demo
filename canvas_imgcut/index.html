@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>New HMTL document by NewJect</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.8.2/index.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.8.2/theme-chalk/index.css">
+	<link rel="stylesheet" href="./css.css">
+</head>
+<body>
+<div id="app">
+    <div :label="label" style="margin-top: 5px;min-width:325px;width:24%">
+        <div class="avatar-mask">
+        <div class="avatar-uploader avatar" ref="imgbox_dom">
+            <img v-if="is_filing" @click="dialogVisible=true" :src="'/common/download/' + file.id" style="display:block;width:100%;">
+            <div v-else class="dl-upload avatar" @mouseenter="open" @mouseleave="stop" v-loading="loading" :element-loading-text="loading_text">
+                <div class="dl-upload-box" @mousedown="img_move_down">
+                    <img v-if="is_screen==true" @click="dialogVisible=true" :src="test_url() ?  file.path : ( file.id&&file.id=='' ? '/common/download/' + file.id +'?date=' + date : '/common/download/temp?file='+ file.path +'&date=' + date) " alt="照片" style="width:100%;height:100%;">
+                    <div v-else>
+                        <img v-if="pic_string!=''" :src="pic_string" style="position: relative;width:100%;height:100%;transform-origin: top left;"
+                            :style="{transform:'scale('+ (zoom/100) +')','left':x +'px','top':y +'px'}">
+                        <i v-else class="el-icon-plus avatar-uploader-icon" style="position: relative;"></i>
+                    </div>
+                </div>
+                <div class="dl-upload-tool" v-show="show_tool">
+                    <i class="el-icon-camera avatar-icon" :class="{active:is_open}" @click="screen" title="拍照" v-if="is_screen==false"></i>
+                    &nbsp;
+                    <i class="el-icon-connection avatar-icon" @click="change" title="切换摄像头" v-if="is_screen==false"></i>
+                    &nbsp;
+                    <i class="el-icon-upload  avatar-icon" v-show="upload&&is_screen==false" >
+                        <input ref="upfile" type="file" name="file" @change="uploader" title="上传本地照片">
+                    </i>
+                    &nbsp;
+                    <i class="el-icon-refresh avatar-icon" @click="rotate" title="旋转图片" v-if="is_screen==true"></i>
+                    &nbsp;
+                    <i class="el-icon-delete  avatar-icon" @click="deleter" title="清除照片" v-if="is_screen==true"></i>
+                </div>
+                <el-slider :min='100' :max='350' class="dl-slider" v-model="zoom" vertical v-if="is_screen==false"></el-slider>
+            </div>
+        </div>
+        </div>
+
+        <el-dialog :visible.sync="dialogVisible" width="40%">
+            <img :src="test_url() ?  file.path : ( file.id&&file.id=='' ? '/common/download/' + file.id +'?date=' + date : '/common/download/temp?file='+ file.path +'&date=' + date) " style="width:100%;height:100%;" alt="">
+        </el-dialog>
+    </div>
+</div>
+    <script>
+        var Ctor = new Vue({
+        name: 'UploadBox',
+        props: {
+            file: Object,
+            is_filing: Boolean,
+            width:String,
+            label:String,
+            upload:Boolean,
+            xuanzhuan:Boolean
+        },
+        watch: {
+            'zoom': 'zoom_evnt',
+            'file'(){
+                if(this.file.path && this.test_url()!=true && this.file.path!=''){
+                    this.is_screen=true;
+                }else{
+                    this.is_screen=false;
+                }
+
+                // if(this.file.id&&this.file.id!=''){
+                //     this.is_screen=true;
+                // }else{
+                //     this.is_screen=false;
+                // }
+            }
+        },
+        data() {
+            return {
+                zoom: 100,
+                x: 0,
+                y: 0,
+                angle:0,
+                is_open: false,
+                loading: false,
+                pic_string:"",
+                is_screen:false,
+                show_tool:false,
+                dialogVisible:false,
+                cam_type: String,
+                loading_text:"拼命上传中",
+                date:"",
+                // file: {
+                //     description: null,
+                //     filename: "",
+                //     id: null,
+                //     owner: null,
+                //     path: "",
+                //     status: null,
+                //     title: "",
+                //     type: "jpg"
+                // },
+                open_cout : 0,
+            }
+        },
+        beforeMount: function () {
+            // if(this.file.id&&this.file.id!=''){
+            //     this.is_screen=true;
+            // }
+            this.date = new Date().getTime();
+            this.cam_type = this.label;
+            this.get_camList();
+            var config_cache = JSON.parse(window.localStorage.getItem(this.cam_type));
+            if(config_cache){
+                this.zoom = config_cache.zoom;
+                this.x = config_cache.x;
+                this.y = config_cache.y;
+            }
+        },
+        mounted(){
+            if(this.file.path && this.test_url()!=true && this.file.path!=''){
+                this.is_screen=true;
+            }else{
+                this.is_screen=false;
+            }
+            this.osW = this.$refs.imgbox_dom.offsetWidth;
+            this.osH = this.$refs.imgbox_dom.offsetHeight;
+
+        },
+        methods: {
+            uploader(e) {
+                this._data.is_screen=true;
+                this.stop();
+                let file = e.target.files[0];
+                let formData = new FormData();
+                formData.append('file', file);
+                if (!this.beforeAvatarUpload(file)) {
+                    this._data.loading = false;
+                    this._data.is_screen=false;
+                    return;
+                }
+                this.upload_img(formData)
+            },
+            upload_img(formData) {
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', '/common/upload/single');
+                xhr.onload = function () {
+                    this._data.loading = false; /* */
+                }.bind(this);
+                xhr.onerror = function (error) {
+                    this._data.loading = false;
+                }.bind(this);
+                xhr.send(formData);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        var res = JSON.parse(xhr.responseText);
+                        this.file.path = res
+                        // this.$emit('update:file.path', res[0].tempName)
+                    }
+                }.bind(this);
+
+                window.localStorage.setItem(this.cam_type,JSON.stringify({Moniker:this.Moniker_name,zoom:this.zoom,x:this.x,y:this.y}));
+            },
+            beforeAvatarUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                const isLt0KB = file.size / 1024 > 0;
+
+                if (!isJPG) {
+                    this.$message.error('上传图片只能是 JPG 格式!');
+                }
+                if (!isLt5M) {
+                    this.$message.error('上传图片大小不能超过 5MB!');
+                }
+                if (!isLt0KB) {
+                    this.$message.error('上传图片大小不能小于0kb!');
+                }
+                return isJPG && isLt5M && isLt0KB;
+            },
+            get_camList: function () {
+                device.WebCam2.initCams({
+                    callback: function (res) {
+                        this.cam_list = res;
+                    }.bind(this)
+                });
+            },
+            open: function (e) {
+                this.init = true;
+                this.osW = this.$refs.imgbox_dom.offsetWidth;
+                this.osH = this.$refs.imgbox_dom.offsetHeight;
+                try { 
+                    e.preventDefault();
+                    this.$refs.imgbox_dom.querySelector('img').addEventListener('load',this.img_siterevise)
+                } catch (error) { }
+                this._data.show_tool =true;
+                if(this.is_screen==true){
+                    return;
+                }
+                this._data.is_open = true;
+                device.WebCam2.initCams({
+                    callback: function (res) {
+                        this.cam_list = res;
+                        try {
+                            if (this.cam_type) {
+                                var config_cache = JSON.parse(window.localStorage.getItem(this.cam_type));
+                                var Moniker = config_cache.Moniker;
+                                var cont = 0;
+                                for(var i=0;i<this.cam_list.length;i++){
+                                    if(this.cam_list[i].MonikerString != Moniker){
+                                        cont++;
+                                    }
+                                }
+                                if(cont == this.cam_list.length){
+                                    Moniker = res[0].MonikerString;
+                                }
+                            }else{
+                                Moniker = res[0].MonikerString;
+                            }
+                        } catch (error) {
+                            Moniker = res[0].MonikerString;
+                        }
+
+                        var config = {
+                            args: {webcam: Moniker},
+                            callback: function (res) {
+                                if(res.Type.indexOf(Moniker)!=-1){
+                                    if (this._data.is_open == true) {
+                                        this.pic_string = "data:image/png;base64," + res.FileName
+                                    }
+                                }
+                            }.bind(this)
+                        };
+                        this.Moniker_name = Moniker;
+                        device.WebCam2.openCams(config);
+                    }.bind(this)
+                });
+            },
+            stop: function () {
+                this._data.is_open = false;
+                this._data.show_tool =false;
+                this.pic_string = "";
+                    // device.WebCam2.stopCams();
+            },
+            screen(){
+                this._data.loading = true;
+                this._data.is_open = false;
+                this._data.is_screen=true;
+                // device.WebCam2.stopCams();
+
+                device.WebCam2.Play({
+                    args:{webcam : this.Moniker_name},
+                    callback:function(res){
+                        var Moniker_info = res;
+                        var config = {
+                            args:{
+                                webcam : this.Moniker_name,
+                                rect:{
+                                    x:0,
+                                    y:0,
+                                    // width:Moniker_info.FrameSize.Width,
+                                    // height:Moniker_info.FrameSize.Height,
+                                    width:1,
+                                    height:1,
+                                },
+                                rotate:0,
+                            },
+                            callback:function(ress){
+                                this.cut_img("data:image/png;base64,"+ress);
+                            }.bind(this)
+                        }
+                        device.WebCam2.snapshot(config)
+                    }.bind(this)
+                });
+            },
+            cut_img(base64String){
+                var osW = this.$refs.imgbox_dom.offsetWidth;
+                var osH = this.$refs.imgbox_dom.offsetHeight;
+
+                var zoom = (this.zoom / 100);
+                var x = this.x, y = this.y;
+                 var img = new Image();
+                 img.src = base64String;
+                 img.onload =function(){
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+
+                    var w = img.width,h = img.height;
+                    var scale_w = w/osW/zoom, scale_h = h/osH/zoom;
+                    var quality = w>3000&&h>2000? 0.7:1;
+
+                    canvas.width  = osW*scale_w;
+                    canvas.height = osH*scale_w;
+
+                    ctx.drawImage(img, x * scale_w , y * scale_w, w, h);
+
+                    var base64 = canvas.toDataURL('image/jpeg',quality);
+                        var bytes = window.atob(base64.split(',')[1]);
+                        var array = [];
+                        for (var i = 0; i < bytes.length; i++) {
+                            array.push(bytes.charCodeAt(i));
+                        }
+                        var blob = new Blob([new Uint8Array(array)], {
+                            type: 'image/jpeg'
+                        });
+
+                        var formData = new FormData();
+                        formData.append('file', blob, Date.now() + '.jpg');
+                        formData.append("xuanzhuan", !this.xuanzhuan ? false : true);
+                        this.upload_img(formData);
+                 }.bind(this);
+            },
+            change: function () {
+                this._data.is_open = false;
+                this._data.show_tool =false;
+                this.pic_string = "";
+                device.WebCam2.stopCams();
+                var Moniker = this.Moniker_name;
+                for (var i = 0; i < this.cam_list.length; i++) {
+                    if (this.cam_list[i].MonikerString == Moniker) {
+                        if (  i + 1 < this.cam_list.length) {
+                             window.localStorage.setItem(this.cam_type,JSON.stringify({
+                                 Moniker:this.cam_list[i + 1].MonikerString,
+                                 zoom:this.zoom,
+                                 x:this.x,
+                                 y:this.y
+                            }));
+                        } else {
+                           window.localStorage.setItem(this.cam_type,JSON.stringify({
+                                 Moniker:this.cam_list[0].MonikerString,
+                                 zoom:this.zoom,
+                                 x:this.x,
+                                 y:this.y
+                            }));
+                        }
+                        setTimeout(this.open, 500);
+                        return;
+                    }
+                }
+            },
+            deleter() {
+                // this.$emit('update:file.path', "");
+                this.is_screen=false
+                this.file.path = "";
+                // this.x = 0;
+                // this.y = 0;
+                // this._data.zoom = 0;
+                this.$refs.upfile.value='';
+                this.open();
+            },
+            img_move_down(e) {
+                e.preventDefault();
+                var oevent = e;
+                var distanceX = oevent.clientX - e.target.offsetLeft;
+                var distanceY = oevent.clientY - e.target.offsetTop;
+                document.onmousemove = function (ev) {
+                    var oevent = ev || event;
+                    var x = oevent.clientX - distanceX;
+                    var y = oevent.clientY - distanceY;
+                    var zoom = (this.zoom / 100);
+                    this.x = x ;
+                    this.y = y ;
+
+                    // if ( x < -50 && x > -(this.zoom * this.osW / 100)) {
+                    // if (Math.abs(x) < (this.zoom * this.osW / 100)) {
+                    // }
+                    // // if ( y < 0 && Math.abs(y) > -(this.zoom * this.osH / 100)) {
+                    // if (Math.abs(y) < (this.zoom * this.osH / 100)) {
+                    // }
+                }.bind(this);
+                document.onmouseup = function () {
+                    document.onmousemove = null;
+                    document.onmouseup = null;
+                };
+            },
+            zoom_evnt() {
+                if(!this.init){return}
+                
+                var zoom = (this.zoom / 100);
+                try {
+                    var osph = this.$refs.imgbox_dom.querySelector('img').offsetHeight;
+                    this.x =  -(this.osW/2)*(zoom-1);
+                    this.y =  -(osph/2)*(zoom-1) - (osph - this.osH)/2;
+                } catch (error) {
+                    this.x =  -(this.osW/2)*(zoom-1);
+                    this.y =  -(this.osH/2)*(zoom-1);
+                }
+            },
+            img_siterevise(){
+                    if(this.open_cout!=0){
+                        return;
+                    }
+                    this.open_cout++;
+                    var osph = this.$refs.imgbox_dom.querySelector('img').offsetHeight;
+                    var zoom = (this.zoom / 100);
+                    this.x =  -(this.osW/2)*(zoom-1);
+                    this.y =  -(osph/2)*(zoom-1) - (osph - this.osH)/2;
+
+                    this.$refs.imgbox_dom.querySelector('img').removeEventListener('load',this.img_siterevise);
+
+                    var config_cache = JSON.parse(window.localStorage.getItem(this.cam_type));
+                    if(config_cache){
+                        this.x = config_cache.x;this.y = config_cache.y;this.zoom = config_cache.zoom;
+                    }
+            },
+            rotate(){
+                axios({
+                    method: 'get',
+                    url: '/common/xuanzhuan/?path=' + this.file.path,
+                }).then(function (response) {
+                    var res = response.data;
+                    if(res){
+                      this.date = new Date().getTime();
+                    }
+                    console.log(this)
+                }.bind(this)).catch(function (error) {
+                    throw error;
+                }.bind(this));
+            },
+            test_url() {
+                return /data\:image\/jpeg;base64\,/.test(this.file.path);
+            }
+        }
+        }).$mount("#app");
+    </script>
+</body>
+</html>

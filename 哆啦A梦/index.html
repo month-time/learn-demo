@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>New HMTL document by NewJect</title>
+<style>
+        div{margin: 0;padding: 0;}
+        .circle{border: 2px solid #000;border-radius: 50%;}
+        .center{width: 450px;height: 500px;margin: 0 auto;position: relative;}
+        .head{position: relative;  width:300px;height: 300px; border: 2px solid #000;border-radius:50%;background: #0FA7D0;}
+        .face{z-index: 4; border: 2px solid #000; position: absolute;top: 65px; left: 25px;width: 250px;height: 225px;background: white;border-radius: 50%/50%;}
+        .eye1,.eye2{position: absolute; border-radius: 90px; width:72.5px;background: #ffffff; height: 77.5px;border:2px solid #000;}
+        .eye1{left: 48.5px;top:-35px; } .eye2{left: 121.5px;top: -35px;}
+        .eyeball1,.eyeball2{position: absolute; width: 14px;height: 14px;background: #000;border-radius: 50% 50%;}
+        .eyeball1{top: 50px;left: 50px;} .eyeball2{top: 50px;left: 7.5px;}
+        .nose{z-index: 5; position: absolute; top: 35px;left: 106.5px; width: 27.5px;height: 27.5px;border-radius: 50%;border: 2px solid #000; background:#CB3D00; }
+        .face::after{left: 121px;top: 62.5px; content:"";width:2px;height: 90px;background: #000;position: absolute;}
+        .mouth1{top: 70px;left: 31.5px; position: absolute; width: 175px;height: 80px;background: #000;}
+        .mouth2{top: 69px;left: 30.9px; position: absolute; width: 180px;height: 82.5px;background: #ffffff;border-radius: 50%;}
+        span{ width:60px;height:1.5px;background: #000; display: block;position: absolute;z-index: 5;}
+        .mustache_middle1{top:80px;left: 25px;}
+        .mustache_middle2{top:80px;left: 160px;}
+        .mustache_top1{top:64px;left:25px;transform: rotate(12deg);}
+        .mustache_top2{top:64px;left:160px;transform: rotate(-12deg);}
+        .mustache_bottom1{top:97px;left:25px;transform: rotate(-12deg);}
+        .mustache_bottom2{top:97px;left:160px;transform: rotate(12deg);}
+        /* 脖子 */
+        .neck{z-index: 8; top: 255px;left: 35px; width: 235px;height: 20px;background: #A32101;border-radius: 25px; position: absolute; border:2px solid #000;}
+        .neck .bell{z-index: 9; left: 95.5px;top: 6px; position: absolute; border: 2px solid #000;border-radius: 50%; content:"";display: block;width: 40px;height: 40px;background: #F6ED24;}
+        .bell_icon{position: absolute;top: 10px; width: 36px;height: 2px;border: 2px solid #000;}
+        .bell_circle{background: #000; position: absolute;top: 20px;left: 14px; width:12px;height: 12px;border-radius: 50%;}
+        .bell_line{top: 30px;left: 19px; width: 2px;height: 10px;background: #000000;position: absolute;}
+        /* 身体 */
+        .body{top: 277px;left: 42px; width: 220px;height: 162px;position: absolute;border: 2px solid #000; background:#0FA7D0; }
+        .body_circle{background: #ffffff; position: absolute;left: 21px;top: -50px;; width: 175px;height: 175px;}
+        .shelter{top:48px;left: 20px;; z-index: 7; width:140px;height:20px;background: #ffffff;position: absolute;}
+        .bellyband{top: 90px;left: 20px; position: absolute; z-index: 9; width: 130px;height: 65px;border: 2px solid; border-radius: 0 0 75px 75px;}
+        .body_bottom_circle{position: absolute;top: 150px;left: 97px; width: 20px;height: 20px;background: #ffffff;}
+        .body_bottom_shelter{position: absolute;top: 164px;left: 95px; width: 30px;height: 20px;background: #ffffff;}
+        .arm1,.arm2{z-index: -1; position: absolute; width: 90px;height: 45px;background: #0FA7D0;border: 2px solid;}
+        .arm1{top:20px;left: -68px;transform: rotate(-40deg);}
+        .arm2{top:20px;left: 194px;transform: rotate(40deg);}
+        .hand1,.hand2{width: 65px;height: 65px;background: #ffffff;position: absolute;}
+        .hand1{top: -10px;left: -30px;}
+        .hand2{top: -10px;right: -30px;}
+        .arm1_shelter,.arm2_shelter{left: -2px; width: 20px;height: 43.5px;background:#0FA7D0; ;position: absolute;z-index: 10;}
+        .arm2_shelter{left: 202px;}
+        /* 脚 */
+        .foot1{border-radius: 20px 11px 11px 11px; top: 441px;left:26px; z-index: 10; position: absolute; width: 120px;height: 32px;border: 2px solid;background: #ffffff;}
+        .foot2{border-radius:11px 20px 11px 11px;  top: 441px; left: 157px; z-index: 10; position: absolute; width: 120px;height: 32px;border: 2px solid;background: #ffffff;}
+    </style>
+</head>
+<body>
+
+    <div class="center">
+        <!-- 头 -->
+        <div class="head">
+            <div class="face">
+                <div class="eye1"><div class="eyeball1"></div></div>
+                <div class="eye2"><div class="eyeball2"></div></div>
+                <div class="nose"></div>
+                <div class="mouth1 circle"></div>
+                <div class="mouth2"></div>
+                <span class="mustache_middle1"></span>
+                <span class="mustache_middle2"></span>
+                <span class="mustache_top1"></span>
+                <span class="mustache_top2"></span>
+                <span class="mustache_bottom1"></span>
+                <span class="mustache_bottom2"></span>
+            </div>
+        </div>
+        <!-- 脖子 -->
+        <div class="neck">
+            <div class="bell">
+                <div class="bell_icon"></div>
+                <div class="bell_circle"></div>
+                <div class="bell_line"></div>
+            </div>
+        </div>
+        <!-- 身体 -->
+        <div class="body">
+            <div class="body_circle circle">
+                <div class="shelter"></div>
+                <div class="bellyband"></div>
+            </div>
+            <div class="body_bottom_circle circle"></div>
+            <div class="body_bottom_shelter"></div>
+            <div class="arm1">
+                <div class="hand1 circle"></div>
+            </div>
+            <div class="arm1_shelter"></div>
+            <div class="arm2">
+                <div class="hand2 circle"></div>
+            </div>
+            <div class="arm2_shelter"></div>
+        </div>
+        <!-- 脚 -->
+        <div class="foot1"></div>
+        <div class="foot2"></div>
+
+    </div>
+
+</body>
+</html>
